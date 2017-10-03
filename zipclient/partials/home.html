@@ -1,0 +1,9 @@
+<form>
+	<input type="text" ng-model="city">
+	<button ng-click="search()">Search for a city's zip codes</button>
+	<ul>
+		<li ng-repeat="zip in zips">
+			{{zip.City}}, {{zip.State}} - {{zip.Code}}
+		</li>
+	</ul>
+</form>

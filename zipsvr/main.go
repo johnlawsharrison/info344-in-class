@@ -8,6 +8,9 @@ import "encoding/json"
 import "os"
 import "strings"
 import "github.com/johnlawsharrison/info344-in-class/zipsvr/models"
+import "github.com/johnlawsharrison/info344-in-class/zipsvr/handlers"
+
+const zipsPath = "/zips/"
 
 func helloHandler(w http.ResponseWriter, r *http.Request) {
 	name := r.URL.Query().Get("name")
@@ -50,5 +53,12 @@ func main() {
 	mux.HandleFunc("/hello", helloHandler)
 	mux.HandleFunc("/memory", memoryHandler)
 	fmt.Printf("server is listening at http://%s\n", addr)
+
+	cityHandler := &handlers.CityHandler{
+		Index:      cityIndex,
+		PathPrefix: zipsPath,
+	}
+	mux.Handle(zipsPath, cityHandler)
+
 	log.Fatal(http.ListenAndServe(addr, mux))
 }
