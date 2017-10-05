@@ -17,7 +17,7 @@ myApp.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
 myApp.controller('ZipsCtrl', ['$scope', '$http', function ($scope, $http) {
 
   $scope.search = function() {
-  	$http.get('http://localhost:4200/zips/' + $scope.city).then(function (response) {
+  	$http.get('http://localhost:80/zips/' + $scope.city).then(function (response) {
 		var data = response.data;
 		$scope.zips = data;
   });
