@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
 )
 
 //usage is a helpful usage string shown when
@@ -67,5 +68,34 @@ func main() {
 	//then switch on the command
 	//and call the appropriate function above,
 	//printing the return value or error
+	command := strings.ToLower(os.Args[1])
+	signingKey := os.Args[2]
+
+	switch command {
+	case "sign":
+		sig, err := sign(signingKey, os.Stdin)
+		if err != nil {
+			fmt.Printf("error signing: %v", err)
+			os.Exit(exitCodeProcessing)
+		}
+		fmt.Println(sig)
+	case "verify":
+		sig64 := os.Args[3]
+		if len(sig64) == 0 {
+			showUsage()
+		}
+		valid, err := verify(signingKey, sig64, os.Stdin)
+		if err != nil {
+			fmt.Printf("error validating: %v", err)
+			os.Exit(exitCodeProcessing)
+		}
+		if valid {
+			fmt.Println("signature was valid")
+		} else {
+			fmt.Println("INVALID SIGNATURE")
+		}
+	default:
+		showUsage()
+	}
 
 }
