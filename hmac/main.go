@@ -1,6 +1,10 @@
 package main
 
 import (
+	"crypto/hmac"
+	"crypto/sha256"
+	"crypto/subtle"
+	"encoding/base64"
 	"fmt"
 	"io"
 	"os"
@@ -44,7 +48,15 @@ func sign(signingKey string, stream io.Reader) (string, error) {
 	//https://golang.org/pkg/crypto/hmac/
 	//https://golang.org/pkg/io/#Copy
 	//https://golang.org/pkg/encoding/base64/
-	return "", fmt.Errorf("TODO")
+	h := hmac.New(sha256.New, []byte(signingKey))
+
+	if _, err := io.Copy(h, stream); err != nil {
+		return "", fmt.Errorf("error copying bytes: %v", err)
+	}
+	sig := h.Sum(nil)
+
+	encoded := base64.StdEncoding.EncodeToString(sig)
+	return encoded, nil
 }
 
 //verify returns true if the base64-encoded HMAC `signature`
@@ -55,7 +67,19 @@ func verify(signingKey string, signature string, stream io.Reader) (bool, error)
 	//TODO: implement this function according to the comments
 	//HINTS: (same as above plus the following)
 	//https://golang.org/pkg/crypto/subtle/#ConstantTimeCompare
-	return false, fmt.Errorf("TODO")
+	sig, err := base64.StdEncoding.DecodeString(signature)
+	if err != nil {
+		return false, fmt.Errorf("error base64-decoding: %v", err)
+	}
+
+	h := hmac.New(sha256.New, []byte(signingKey))
+
+	if _, err := io.Copy(h, stream); err != nil {
+		return false, fmt.Errorf("error copying bytes: %v", err)
+	}
+	sig2 := h.Sum(nil)
+
+	return subtle.ConstantTimeCompare(sig, sig2) == 1, err
 }
 
 func main() {
