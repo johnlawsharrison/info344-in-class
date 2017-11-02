@@ -13,7 +13,7 @@ app.use(morgan(process.env.LOG_FORMAT || "dev"));
 
 app.get("/", (req, res) => {
 	res.set("Content-Type", "text/plain");
-	res.send("Hello, Node.js");
+	res.send("Hello, Node.js!");
 });
 
 app.get("/v1/users/me/hello", (req, res) => {
@@ -29,7 +29,7 @@ app.get("/v1/users/me/hello", (req, res) => {
 
 // error handler (to prevent stacktrace being returned to client)
 app.use((err, req, res, next) => {
-	console.error(error.stack);
+	console.error(err.stack);
 	// send only the error message back to the client
 	res.set("Content-Type", "text/plain");
 	res.send(err.message);
