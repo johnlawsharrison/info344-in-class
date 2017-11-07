@@ -27,6 +27,9 @@ app.get("/v1/users/me/hello", (req, res) => {
 	});
 });
 
+const handlers = require("./handlers.js");
+app.use(handlers({}));
+
 // error handler (to prevent stacktrace being returned to client)
 app.use((err, req, res, next) => {
 	console.error(err.stack);

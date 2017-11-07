@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -29,12 +30,12 @@ func NewServiceProxy(addrs []string) *httputil.ReverseProxy {
 	return &httputil.ReverseProxy{
 		Director: func(r *http.Request) {
 			// modify the request to indicate remote host
-			// user := GetCurrentUser(r)
-			// // userJSON, err := json.Marshal(user)
-			// if err != nil {
-			// 	log.Printf("error marshaling user: %v", err)
-			// }
-			// r.Header.Add("X-User", string(userJSON))
+			user := GetCurrentUser(r)
+			userJSON, err := json.Marshal(user)
+			if err != nil {
+				log.Printf("error marshaling user: %v", err)
+			}
+			r.Header.Add("X-User", string(userJSON))
 
 			mx.Lock()
 			r.URL.Host = addrs[nextIndex%len(addrs)]
@@ -75,6 +76,7 @@ func main() {
 	//TODO: add reverse proxy handler for `/v1/hello`
 	mux.Handle("/v1/hello", NewServiceProxy(splitHelloSvcAddrs))
 	mux.Handle("/v1/users/me/hello", NewServiceProxy(splitNodeSvcAddrs))
+	mux.Handle("/v1/channels", NewServiceProxy(splitNodeSvcAddrs))
 
 	log.Printf("server is listening at https://%s...", addr)
 	log.Fatal(http.ListenAndServeTLS(addr, "tls/fullchain.pem", "tls/privkey.pem", mux))
